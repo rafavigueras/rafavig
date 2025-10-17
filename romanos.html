@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Números Romanos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Tone.js para efectos de sonido -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+
+    <style>
+        /* Estilos base con la fuente Nunito */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #89f7fe; /* Degradado de fondo azul */
+            background: linear-gradient(to bottom, #89f7fe, #66a6ff);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Efecto de 'presionado' en los botones */
+        .btn-press-effect:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Animación de 'shake' para errores */
+        @keyframes shake {
+          10%, 90% { transform: translateX(-1px); }
+          20%, 80% { transform: translateX(2px); }
+          30%, 50%, 70% { transform: translateX(-4px); }
+          40%, 60% { transform: translateX(4px); }
+        }
+        .animate-shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="min-h-screen w-full flex items-center justify-center p-4">
+        <div class="w-full max-w-lg mx-auto">
+
+            <!-- 1. Pantalla de Inicio -->
+            <div id="home-screen" class="text-center space-y-6">
+                <h1 class="text-5xl md:text-7xl font-black text-white text-shadow-lg" style="text-shadow: 4px 4px 0px rgba(0,0,0,0.15);">Números Romanos</h1>
+                <div class="grid grid-cols-1 gap-4 p-4 bg-white/50 rounded-2xl shadow-xl">
+                    <!-- Botones Principales -->
+                    <button id="new-game-btn" class="w-full bg-lime-500 hover:bg-lime-600 text-white font-black py-5 px-6 rounded-2xl text-3xl shadow-lg border-b-4 border-lime-700 btn-press-effect transition-all">
+                        Nueva Partida
+                    </button>
+                    <button id="scores-btn" class="w-full bg-sky-400 hover:bg-sky-500 text-white font-bold py-4 px-6 rounded-xl text-2xl shadow-md border-b-4 border-sky-600 btn-press-effect transition-all">
+                        Clasificación
+                    </button>
+                    <button id="learn-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 px-6 rounded-xl text-2xl shadow-md border-b-4 border-indigo-700 btn-press-effect transition-all">
+                        Aprender los Romanos
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal para introducir el nombre -->
+            <div id="name-modal" class="hidden bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl text-center">
+                 <h2 class="text-3xl font-black text-slate-700 mb-4">¿Cómo te llamas?</h2>
+                 <input type="text" id="player-name-input" maxlength="16" placeholder="Tu nombre" class="w-full border-4 border-slate-300 rounded-lg p-3 text-center text-xl focus:outline-none focus:ring-4 focus:ring-yellow-400 transition-all">
+                 <button id="start-game-btn" class="w-full mt-4 bg-lime-500 hover:bg-lime-600 text-white font-black py-3 px-6 rounded-xl text-xl shadow-lg border-b-4 border-lime-700 btn-press-effect transition-all">
+                     ¡Empezar!
+                 </button>
+                 <button id="cancel-name-btn" class="w-full mt-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-2 px-4 rounded-xl text-lg btn-press-effect transition-all">
+                     Volver
+                 </button>
+            </div>
+
+            <!-- 2. Pantalla de Juego -->
+            <div id="game-screen" class="hidden bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <div id="player-info" class="text-lg font-bold text-indigo-600 bg-white px-3 py-1 rounded-lg"></div>
+                    <div id="timer" class="text-3xl font-black text-slate-700 bg-white px-4 py-2 rounded-lg shadow-inner">00:00</div>
+                </div>
+
+                <div class="text-center">
+                    <div id="progress-bar" class="text-base text-slate-500 mb-4 font-bold"></div>
+                    <div id="problem" class="text-7xl md:text-8xl font-black text-slate-700 my-8"></div>
+                    
+                    <form id="answer-form">
+                        <input type="text" id="answer-input" class="w-full text-center text-5xl p-4 bg-transparent border-b-8 border-slate-300 focus:border-yellow-400 focus:outline-none transition-colors duration-300 uppercase" placeholder="..." autocomplete="off">
+                        <button type="submit" class="hidden">Enviar</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 3. Pantalla de Clasificación -->
+            <div id="scores-screen" class="hidden bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl w-full">
+                <h2 class="text-4xl text-center font-black text-sky-600 mb-6">Top 10 - Clasificación</h2>
+                <div id="high-scores-list" class="space-y-2"></div>
+                <button id="play-again-from-scores-btn" class="w-full mt-8 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-xl text-xl shadow-lg border-b-4 border-yellow-600 btn-press-effect transition-all">
+                    Jugar de Nuevo
+                </button>
+                 <button id="back-to-home-from-scores-btn" class="w-full mt-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-2 px-4 rounded-xl text-lg btn-press-effect transition-all">
+                     Volver al Inicio
+                 </button>
+            </div>
+
+            <!-- 4. Pantalla de Aprendizaje -->
+            <div id="learn-screen" class="hidden bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl w-full max-h-[80vh] overflow-y-auto">
+                <h2 class="text-4xl text-center font-black text-indigo-600 mb-6">Aprender los Romanos</h2>
+                <div class="space-y-6 text-lg">
+                    <div>
+                        <h3 class="font-black text-2xl text-slate-700 mb-2">Símbolos Básicos</h3>
+                        <ul class="list-none space-y-2 bg-white/70 p-4 rounded-lg">
+                            <li class="flex justify-between font-bold"><span>I</span> <span>1</span></li>
+                            <li class="flex justify-between font-bold"><span>V</span> <span>5</span></li>
+                            <li class="flex justify-between font-bold"><span>X</span> <span>10</span></li>
+                            <li class="flex justify-between font-bold"><span>L</span> <span>50</span></li>
+                            <li class="flex justify-between font-bold"><span>C</span> <span>100</span></li>
+                            <li class="flex justify-between font-bold"><span>D</span> <span>500</span></li>
+                            <li class="flex justify-between font-bold"><span>M</span> <span>1000</span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-2xl text-slate-700 mb-2">Reglas de Resta</h3>
+                        <p class="text-slate-600 mb-3">Un símbolo de menor valor a la izquierda de uno mayor, se resta.</p>
+                        <ul class="list-none space-y-2 bg-white/70 p-4 rounded-lg">
+                            <li class="flex justify-between font-bold"><span>IV</span> <span>4 (5 - 1)</span></li>
+                            <li class="flex justify-between font-bold"><span>IX</span> <span>9 (10 - 1)</span></li>
+                            <li class="flex justify-between font-bold"><span>XL</span> <span>40 (50 - 10)</span></li>
+                            <li class="flex justify-between font-bold"><span>XC</span> <span>90 (100 - 10)</span></li>
+                            <li class="flex justify-between font-bold"><span>CD</span> <span>400 (500 - 100)</span></li>
+                            <li class="flex justify-between font-bold"><span>CM</span> <span>900 (1000 - 100)</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="back-from-learn-btn" class="w-full mt-8 bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-6 rounded-xl text-xl shadow-lg border-b-4 border-sky-700 btn-press-effect transition-all">
+                    Volver
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ELEMENTOS DEL DOM ---
+        const allScreens = {
+            home: document.getElementById('home-screen'),
+            name: document.getElementById('name-modal'),
+            game: document.getElementById('game-screen'),
+            scores: document.getElementById('scores-screen'),
+            learn: document.getElementById('learn-screen'),
+        };
+        
+        const playerNameInput = document.getElementById('player-name-input');
+        const playerInfo = document.getElementById('player-info');
+        const timerEl = document.getElementById('timer');
+        const problemEl = document.getElementById('problem');
+        const answerInput = document.getElementById('answer-input');
+        const answerForm = document.getElementById('answer-form');
+        const progressBar = document.getElementById('progress-bar');
+        const highScoresList = document.getElementById('high-scores-list');
+
+        // --- ESTADO Y DATOS DEL JUEGO ---
+        let highScores = JSON.parse(localStorage.getItem('romanHighScores')) || [];
+        let currentPlayer = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let timerInterval;
+        let secondsElapsed = 0;
+        let audioStarted = false;
+
+        // --- EFECTOS DE SONIDO (Tone.js) ---
+        const correctSound = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
+        const wrongSound = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0, release: 0.2 } }).toDestination();
+
+        // --- LÓGICA DE NAVEGACIÓN Y JUEGO ---
+        function showScreen(screenId) {
+            Object.values(allScreens).forEach(screen => screen.classList.add('hidden'));
+            allScreens[screenId].classList.remove('hidden');
+        }
+
+        async function startAudioContext() {
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+            }
+        }
+
+        function prepareNewGame() {
+            startAudioContext();
+            showScreen('name');
+            playerNameInput.focus();
+        }
+        
+        // --- FUNCIÓN CLAVE: CONVERTIR ARÁBIGO A ROMANO ---
+        function toRoman(num) {
+            if (num < 1 || num > 3999) return ''; // Rango válido
+            const val = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+            const rom = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"];
+            let result = "";
+            for (let i = 0; i < val.length; i++) {
+                while (num >= val[i]) {
+                    result += rom[i];
+                    num -= val[i];
+                }
+            }
+            return result;
+        }
+
+        function generateQuestions(count) {
+            const questions = new Set();
+            while (questions.size < count) {
+                // Generamos números entre 1 y 3000
+                questions.add(Math.floor(Math.random() * 3000) + 1);
+            }
+            return Array.from(questions);
+        }
+
+        function startGame() {
+            const name = playerNameInput.value.trim();
+            if (!name) {
+                playerNameInput.classList.add('border-red-500', 'animate-shake');
+                setTimeout(() => {
+                    playerNameInput.classList.remove('border-red-500', 'animate-shake');
+                }, 820);
+                return;
+            }
+            currentPlayer = name;
+            currentQuestions = generateQuestions(5);
+            currentQuestionIndex = 0;
+            
+            showScreen('game');
+            playerInfo.textContent = currentPlayer;
+            displayNextQuestion();
+            startTimer();
+        }
+
+        function displayNextQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            problemEl.textContent = question;
+            answerInput.value = '';
+            answerInput.focus();
+            progressBar.textContent = `Pregunta ${currentQuestionIndex + 1} de 5`;
+        }
+
+        function checkAnswer(e) {
+            e.preventDefault();
+            // La respuesta del usuario ya está en mayúsculas por el `uppercase` del input
+            const userAnswer = answerInput.value.trim();
+            const correctAnswer = toRoman(currentQuestions[currentQuestionIndex]);
+
+            if (userAnswer === correctAnswer) {
+                correctSound.triggerAttackRelease("C5", "8n", Tone.now());
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentQuestions.length) {
+                    displayNextQuestion();
+                } else {
+                    endGame();
+                }
+            } else {
+                wrongSound.triggerAttackRelease("A2", "8n", Tone.now());
+                answerInput.value = '';
+                answerInput.classList.add('bg-red-200');
+                setTimeout(() => answerInput.classList.remove('bg-red-200'), 500);
+            }
+        }
+
+        function endGame() {
+            stopTimer();
+            saveScore(currentPlayer, secondsElapsed);
+            displayHighScores();
+            setTimeout(() => showScreen('scores'), 100);
+        }
+
+        function startTimer() {
+            secondsElapsed = 0;
+            timerEl.textContent = '00:00';
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const minutes = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+                const seconds = (secondsElapsed % 60).toString().padStart(2, '0');
+                timerEl.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        function stopTimer() { clearInterval(timerInterval); }
+
+        // --- PUNTUACIONES (localStorage) ---
+        function saveScore(name, time) {
+            highScores.push({ name, time });
+            highScores.sort((a, b) => a.time - b.time); // Ordenar por menor tiempo
+            highScores = highScores.slice(0, 10); // Mantener solo el Top 10
+            localStorage.setItem('romanHighScores', JSON.stringify(highScores));
+        }
+
+        function displayHighScores() {
+            highScoresList.innerHTML = ''; 
+
+            if (highScores.length === 0) {
+                highScoresList.innerHTML = '<p class="text-center text-slate-500 font-bold p-4">¡Aún no hay puntuaciones!</p>';
+                return;
+            }
+            
+            const medals = ['🥇', '🥈', '🥉'];
+            highScores.forEach((score, index) => {
+                const minutes = Math.floor(score.time / 60).toString().padStart(2, '0');
+                const seconds = (score.time % 60).toString().padStart(2, '0');
+                const timeFormatted = `${minutes}:${seconds}`;
+                const scoreEl = document.createElement('div');
+                scoreEl.className = 'grid grid-cols-12 gap-2 items-center text-lg p-3 rounded-lg font-bold transition-all';
+                scoreEl.classList.add(index % 2 === 0 ? 'bg-white/90' : 'bg-slate-200/90');
+                scoreEl.innerHTML = `
+                    <div class="col-span-2 text-center text-2xl">${medals[index] || `<strong>${index + 1}</strong>`}</div>
+                    <div class="col-span-6 text-slate-700">${score.name}</div>
+                    <div class="col-span-4 text-right text-indigo-600">${timeFormatted}</div>
+                `;
+                highScoresList.appendChild(scoreEl);
+            });
+        }
+        
+        // --- EVENT LISTENERS ---
+        document.getElementById('new-game-btn').addEventListener('click', prepareNewGame);
+        document.getElementById('cancel-name-btn').addEventListener('click', () => showScreen('home'));
+        document.getElementById('start-game-btn').addEventListener('click', startGame);
+        playerNameInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') startGame(); });
+        answerForm.addEventListener('submit', checkAnswer);
+        document.getElementById('scores-btn').addEventListener('click', () => { displayHighScores(); showScreen('scores'); });
+        document.getElementById('play-again-from-scores-btn').addEventListener('click', prepareNewGame);
+        document.getElementById('back-to-home-from-scores-btn').addEventListener('click', () => showScreen('home'));
+        document.getElementById('learn-btn').addEventListener('click', () => showScreen('learn'));
+        document.getElementById('back-from-learn-btn').addEventListener('click', () => showScreen('home'));
+        // Evento para convertir a mayúsculas al escribir
+        answerInput.addEventListener('input', () => {
+            answerInput.value = answerInput.value.toUpperCase();
+        });
+
+
+        // --- INICIALIZACIÓN ---
+        showScreen('home');
+    </script>
+</body>
+</html>
