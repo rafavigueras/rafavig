@@ -3,621 +3,590 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learn English!</title>
+    <title>Irregular Verbs Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            background: #89f7fe; /* Fallback background */
-            background: linear-gradient(to bottom, #89f7fe, #66a6ff);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            background: #89f7fe;
+            background: linear-gradient(135deg, #66a6ff 0%, #89f7fe 100%);
+            min-height: 100vh;
         }
-        .text-shadow-lg {
-            text-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+        
+        /* Custom Animations */
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
         }
-        .btn {
-            @apply w-full font-bold py-4 px-5 rounded-2xl text-xl shadow-lg transition-all;
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        .btn-press-effect:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+        .input-field {
+            transition: all 0.2s;
+            border: 2px solid transparent;
         }
-        @keyframes shake {
-          10%, 90% { transform: translateX(-1px); }
-          20%, 80% { transform: translateX(2px); }
-          30%, 50%, 70% { transform: translateX(-4px); }
-          40%, 60% { transform: translateX(4px); }
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
         }
-        .animate-shake {
-            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        .input-correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #15803d !important;
         }
-        .screen {
-            display: none;
+        .input-incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
         }
-        .active {
-            display: block;
-        }
-        .game-card {
-             @apply bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl w-full;
-        }
-        .form-input {
-            @apply flex-1 p-2 bg-transparent border-b-4 border-slate-300 focus:border-yellow-400 focus:outline-none transition-colors text-slate-800;
-        }
-        .form-label {
-            @apply w-1/3 text-slate-600;
-        }
-        .input-error {
-            border-color: #ef4444 !important; /* Tailwind's red-500 */
-        }
-        .input-correct-solution {
-            color: #16a34a; /* Tailwind's green-600 */
-            border-color: #16a34a !important;
+        
+        /* Utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="flex items-center justify-center p-4">
 
-    <div class="min-h-screen w-full flex items-center justify-center p-4">
-        <div class="w-full max-w-lg mx-auto">
+    <div class="w-full max-w-2xl">
+        
+        <!-- HEADER -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-black text-white drop-shadow-md mb-2 tracking-tight">
+                IRREGULAR <span class="text-indigo-600 bg-white px-2 rounded-lg transform -skew-x-6 inline-block">VERBS</span>
+            </h1>
+            <p class="text-white font-bold text-lg opacity-90">Master the forms</p>
+        </header>
 
-            <!-- Home Screen -->
-            <div id="home-screen" class="screen active text-center space-y-6">
-                <h1 class="text-6xl md:text-8xl font-black text-white text-shadow-lg">Learn English!</h1>
-                <div class="grid grid-cols-1 gap-4 p-4 bg-white/50 rounded-2xl shadow-xl">
-                    <button id="new-game-easy-btn" class="btn bg-cyan-500 hover:bg-cyan-600 text-white border-b-4 border-cyan-700 btn-press-effect">
-                        New Game: easy (Past Simple)
-                    </button>
-                    <button id="new-game-hard-btn" class="btn bg-yellow-400 hover:bg-yellow-500 text-white border-b-4 border-yellow-600 btn-press-effect">
-                        New Game: hard (Past Participle)
-                    </button>
-                    <button id="results-btn" class="btn bg-green-400 hover:bg-green-500 text-white border-b-4 border-green-600 btn-press-effect">
-                        Results
-                    </button>
-                    <button id="solutions-btn" class="btn bg-indigo-500 hover:bg-indigo-600 text-white border-b-4 border-indigo-700 btn-press-effect">
-                        Solutions / Study
-                    </button>
-                </div>
-            </div>
-
-            <!-- Name Input Modal -->
-            <div id="name-modal" class="screen game-card text-center">
-                 <h2 class="text-3xl font-black text-slate-700 mb-4">What's your name?</h2>
-                 <input type="text" id="player-name-input" maxlength="16" placeholder="Your Name" class="w-full border-4 border-slate-300 rounded-lg p-3 text-center text-xl focus:outline-none focus:ring-4 focus:ring-yellow-400 transition-all">
-                 <button id="start-game-btn" class="w-full mt-4 bg-lime-500 hover:bg-lime-600 text-white font-black py-3 px-6 rounded-xl text-xl shadow-lg border-b-4 border-lime-700 btn-press-effect transition-all">
-                     Start!
-                 </button>
-                 <button id="cancel-name-btn" class="w-full mt-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-2 px-4 rounded-xl text-lg btn-press-effect transition-all">
-                     Back
-                 </button>
-            </div>
-
-            <!-- Game Screen -->
-            <div id="game-screen" class="screen game-card">
-                <div class="flex justify-between items-center mb-6">
-                    <div id="question-counter" class="text-lg font-bold text-indigo-600 bg-white px-3 py-1 rounded-lg">1 / 10</div>
-                    <div id="timer" class="text-3xl font-black text-slate-700 bg-white px-4 py-2 rounded-lg shadow-inner">00:00</div>
-                </div>
-                <div class="text-center">
-                    <div id="question-area" class="text-4xl md:text-5xl font-black text-slate-700 mb-4">
-                        <!-- Verb will be injected here -->
-                    </div>
-                     <div id="spanish-hint" class="text-2xl font-bold text-slate-500 mb-8">
-                        <!-- Spanish hint will be injected here -->
-                    </div>
-                    <form id="answer-form" class="w-full max-w-sm mx-auto text-left space-y-6 text-2xl font-bold">
-                        <div class="flex items-center space-x-4">
-                            <label for="past-simple-input" class="form-label">Past Simple:</label>
-                            <input type="text" id="past-simple-input" class="form-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        </div>
-                        <div id="past-participle-wrapper" class="flex items-center space-x-4">
-                            <label for="past-participle-input" class="form-label">Past Participle:</label>
-                            <input type="text" id="past-participle-input" class="form-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        </div>
-                        <button type="submit" id="check-answer-btn" class="w-full mt-8 bg-pink-500 hover:bg-pink-600 text-white font-black py-3 px-6 rounded-xl text-xl shadow-lg border-b-4 border-pink-700 btn-press-effect transition-all">
-                            Check Answer
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Results Screen -->
-            <div id="results-screen" class="screen game-card">
-                <h1 class="text-4xl text-center font-black mb-6 text-sky-600">High Scores</h1>
-                <div class="w-full overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="border-b-2 border-sky-300">
-                                <th class="p-2">#</th>
-                                <th class="p-2">Name</th>
-                                <th class="p-2 text-center">Score</th>
-                                <th class="p-2 text-right">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="scores-list">
-                            <!-- Scores will be injected here -->
-                        </tbody>
-                    </table>
-                </div>
-                <button id="play-again-btn" class="w-full mt-8 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-xl text-xl shadow-lg border-b-4 border-yellow-600 btn-press-effect transition-all">
-                    Play Again
-                </button>
-                 <button id="back-to-home-from-results-btn" class="w-full mt-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-2 px-4 rounded-xl text-lg btn-press-effect transition-all">
-                     Back to Home
-                 </button>
-            </div>
+        <!-- MAIN CARD -->
+        <main id="main-container" class="glass-panel rounded-3xl shadow-2xl overflow-hidden relative min-h-[400px]">
             
-            <!-- Solutions Screen -->
-            <div id="solutions-screen" class="screen game-card">
-                <h1 class="text-4xl text-center font-black mb-6 text-indigo-600">Verb List</h1>
-                <div class="max-h-[60vh] overflow-y-auto">
-                    <table class="w-full text-left text-sm md:text-base">
-                        <thead class="sticky top-0 bg-white/80 backdrop-blur-sm">
-                            <tr class="border-b-2 border-indigo-300">
-                                <th class="p-2 font-black">Infinitive</th>
-                                <th class="p-2 font-black">Past Simple</th>
-                                <th class="p-2 font-black">Past Participle</th>
-                                <th class="p-2 font-black">Spanish</th>
+            <!-- SCREEN: HOME -->
+            <div id="screen-home" class="p-8 flex flex-col items-center justify-center h-full space-y-6 animate-pop">
+                <div class="text-center space-y-2">
+                    <h2 class="text-2xl font-bold text-gray-800">Welcome!</h2>
+                    <p class="text-gray-600">Enter your name to start tracking your progress.</p>
+                </div>
+                
+                <input type="text" id="player-name" placeholder="Your Name" 
+                    class="w-full max-w-xs text-center text-xl font-bold py-3 px-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 outline-none transition-colors bg-white/50">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full pt-4">
+                    <button id="btn-easy" class="group relative p-4 bg-emerald-500 hover:bg-emerald-600 rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+                        <div class="text-white font-black text-xl">EASY MODE</div>
+                        <div class="text-emerald-100 text-sm font-bold">Infinitive → Past Simple</div>
+                    </button>
+                    <button id="btn-hard" class="group relative p-4 bg-rose-500 hover:bg-rose-600 rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+                        <div class="text-white font-black text-xl">HARD MODE</div>
+                        <div class="text-rose-100 text-sm font-bold">Complete 2 Missing Forms</div>
+                    </button>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button id="btn-view-results" class="text-indigo-600 font-bold hover:underline">View Scores</button>
+                    <span class="text-gray-400">|</span>
+                    <button id="btn-view-list" class="text-indigo-600 font-bold hover:underline">Study List</button>
+                </div>
+            </div>
+
+            <!-- SCREEN: GAME -->
+            <div id="screen-game" class="hidden p-6 md:p-8 h-full flex flex-col">
+                <!-- Game Header -->
+                <div class="flex justify-between items-center mb-6 bg-indigo-50 rounded-xl p-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg" id="q-number">1</div>
+                        <span class="font-bold text-gray-500 text-sm uppercase tracking-wider">Question</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-black text-2xl text-indigo-600" id="score-display">0</div>
+                        <div class="text-xs font-bold text-gray-400 uppercase">Score</div>
+                    </div>
+                </div>
+
+                <!-- Verb Forms Grid -->
+                <form id="game-form" class="flex-1 flex flex-col justify-center gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="inputs-container">
+                        
+                        <!-- Infinitive -->
+                        <div id="container-infinitive" class="flex flex-col gap-2">
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest text-center">Infinitive</label>
+                            <input type="text" id="input-infinitive" autocomplete="off"
+                                class="input-field w-full p-4 text-center font-bold text-xl rounded-xl bg-gray-50 text-gray-800 placeholder-gray-300 shadow-inner"
+                                placeholder="...">
+                        </div>
+
+                        <!-- Past Simple -->
+                        <div id="container-past" class="flex flex-col gap-2">
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest text-center">Past Simple</label>
+                            <input type="text" id="input-past" autocomplete="off"
+                                class="input-field w-full p-4 text-center font-bold text-xl rounded-xl bg-gray-50 text-gray-800 placeholder-gray-300 shadow-inner"
+                                placeholder="...">
+                        </div>
+
+                        <!-- Past Participle -->
+                        <div id="container-participle" class="flex flex-col gap-2">
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest text-center">Past Participle</label>
+                            <input type="text" id="input-participle" autocomplete="off"
+                                class="input-field w-full p-4 text-center font-bold text-xl rounded-xl bg-gray-50 text-gray-800 placeholder-gray-300 shadow-inner"
+                                placeholder="...">
+                        </div>
+                    </div>
+
+                    <!-- Feedback Area -->
+                    <div id="feedback-area" class="h-8 text-center font-bold text-lg opacity-0 transition-opacity">
+                        <!-- JS injects feedback here -->
+                    </div>
+
+                    <!-- Action Button -->
+                    <button type="submit" id="btn-submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xl shadow-lg transition-transform active:scale-95">
+                        Check Answer
+                    </button>
+                    <button type="button" id="btn-next" class="hidden w-full py-4 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-xl shadow-lg transition-transform active:scale-95">
+                        Next Verb →
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <button id="btn-quit" class="text-gray-400 hover:text-red-500 text-sm font-bold transition-colors">Exit Game</button>
+                </div>
+            </div>
+
+            <!-- SCREEN: RESULTS -->
+            <div id="screen-results" class="hidden p-8 flex flex-col items-center justify-center text-center h-full space-y-6 animate-pop">
+                <div class="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl shadow-lg mb-2">
+                    🏆
+                </div>
+                <div>
+                    <h2 class="text-3xl font-black text-gray-800 mb-1">Game Over!</h2>
+                    <p class="text-gray-500 font-bold" id="final-player-name">Player</p>
+                </div>
+                
+                <div class="bg-indigo-50 rounded-2xl p-6 w-full max-w-sm">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-gray-500 font-bold text-sm uppercase">Final Score</span>
+                        <span class="text-4xl font-black text-indigo-600" id="final-score">0/10</span>
+                    </div>
+                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="final-bar" class="h-full bg-indigo-600 w-0 transition-all duration-1000"></div>
+                    </div>
+                    <p class="text-right text-xs font-bold text-gray-400 mt-2" id="final-time">Time: 00:00</p>
+                </div>
+
+                <div class="flex gap-4 w-full pt-4">
+                    <button id="btn-home-results" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors">
+                        Home
+                    </button>
+                    <button id="btn-replay" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-colors">
+                        Play Again
+                    </button>
+                </div>
+                
+                <!-- Scoreboard preview -->
+                <div class="w-full mt-4">
+                    <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-2">Recent Scores</h3>
+                    <div id="mini-scoreboard" class="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100 max-h-32 overflow-y-auto text-sm">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN: LIST -->
+            <div id="screen-list" class="hidden absolute inset-0 bg-white z-20 flex flex-col">
+                <div class="p-4 bg-indigo-600 text-white flex justify-between items-center shadow-md">
+                    <h2 class="font-bold text-lg">Study List</h2>
+                    <button id="btn-close-list" class="bg-indigo-700 hover:bg-indigo-800 px-3 py-1 rounded text-sm font-bold">Close</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-100 text-gray-500 text-xs uppercase sticky top-0">
+                            <tr>
+                                <th class="p-2 rounded-tl-lg">Infinitive</th>
+                                <th class="p-2">Past Simple</th>
+                                <th class="p-2 rounded-tr-lg">Participle</th>
                             </tr>
                         </thead>
-                        <tbody id="solutions-table-body">
-                            <!-- Verb list will be injected here -->
+                        <tbody id="verbs-table-body" class="text-gray-700 text-sm font-medium divide-y divide-gray-100">
+                            <!-- JS Injected -->
                         </tbody>
                     </table>
                 </div>
-                 <button id="back-to-home-from-solutions-btn" class="w-full mt-8 bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-6 rounded-xl text-xl shadow-lg border-b-4 border-sky-700 btn-press-effect transition-all">
-                    Back
-                </button>
             </div>
 
-        </div>
+        </main>
+        
+        <footer class="text-center mt-6 text-white/60 text-sm font-bold">
+            English Verbs Trainer v2.0
+        </footer>
     </div>
 
-    <script type="module">
-        // --- DOM Elements ---
+    <!-- LOGIC -->
+    <script>
+        // --- DATA ---
+        // Based on the provided CSV file content
+        const verbsData = [
+            { i: "be", p: "was / were", pp: "been" },
+            { i: "become", p: "became", pp: "become" },
+            { i: "begin", p: "began", pp: "begun" },
+            { i: "break", p: "broke", pp: "broken" },
+            { i: "bring", p: "brought", pp: "brought" },
+            { i: "build", p: "built", pp: "built" },
+            { i: "buy", p: "bought", pp: "bought" },
+            { i: "catch", p: "caught", pp: "caught" },
+            { i: "choose", p: "chose", pp: "chosen" },
+            { i: "cut", p: "cut", pp: "cut" },
+            { i: "come", p: "came", pp: "come" },
+            { i: "do", p: "did", pp: "done" },
+            { i: "draw", p: "drew", pp: "drawn" },
+            { i: "drink", p: "drank", pp: "drunk" },
+            { i: "drive", p: "drove", pp: "driven" },
+            { i: "eat", p: "ate", pp: "eaten" },
+            { i: "fall", p: "fell", pp: "fallen" },
+            { i: "feel", p: "felt", pp: "felt" },
+            { i: "fight", p: "fought", pp: "fought" },
+            { i: "find", p: "found", pp: "found" },
+            { i: "fly", p: "flew", pp: "flown" },
+            { i: "forget", p: "forgot", pp: "forgotten" },
+            { i: "get", p: "got", pp: "got" },
+            { i: "give", p: "gave", pp: "given" },
+            { i: "go", p: "went", pp: "gone" },
+            { i: "grow", p: "grew", pp: "grown" },
+            { i: "have", p: "had", pp: "had" },
+            { i: "hear", p: "heard", pp: "heard" },
+            { i: "hide", p: "hid", pp: "hidden" },
+            { i: "hold", p: "held", pp: "held" },
+            { i: "keep", p: "kept", pp: "kept" },
+            { i: "know", p: "knew", pp: "known" },
+            { i: "learn", p: "learned", pp: "learned" },
+            { i: "leave", p: "left", pp: "left" },
+            { i: "lend", p: "lent", pp: "lent" },
+            { i: "light", p: "lit", pp: "lit" },
+            { i: "lose", p: "lost", pp: "lost" },
+            { i: "make", p: "made", pp: "made" },
+            { i: "meet", p: "met", pp: "met" },
+            { i: "pay", p: "paid", pp: "paid" },
+            { i: "put", p: "put", pp: "put" },
+            { i: "read", p: "read", pp: "read" },
+            { i: "ride", p: "rode", pp: "ridden" },
+            { i: "run", p: "ran", pp: "run" },
+            { i: "say", p: "said", pp: "said" },
+            { i: "see", p: "saw", pp: "seen" },
+            { i: "sell", p: "sold", pp: "sold" },
+            { i: "send", p: "sent", pp: "sent" },
+            { i: "sew", p: "sewed", pp: "sewn" },
+            { i: "show", p: "showed", pp: "shown" },
+            { i: "sing", p: "sang", pp: "sung" }
+        ];
+
+        // --- STATE ---
+        const state = {
+            playerName: '',
+            score: 0,
+            questionCount: 0,
+            totalQuestions: 10,
+            mode: 'easy', // 'easy' or 'hard'
+            currentVerb: null,
+            startTime: null,
+            endTime: null,
+            hiddenFields: [] // ['i', 'p', 'pp'] keys that are hidden
+        };
+
+        const scores = JSON.parse(localStorage.getItem('verbScores')) || [];
+
+        // --- DOM ELEMENTS ---
         const screens = {
-            home: document.getElementById('home-screen'),
-            nameModal: document.getElementById('name-modal'),
-            game: document.getElementById('game-screen'),
-            results: document.getElementById('results-screen'),
-            solutions: document.getElementById('solutions-screen'),
+            home: document.getElementById('screen-home'),
+            game: document.getElementById('screen-game'),
+            results: document.getElementById('screen-results'),
+            list: document.getElementById('screen-list')
         };
-        const buttons = {
-            newGameEasy: document.getElementById('new-game-easy-btn'),
-            newGameHard: document.getElementById('new-game-hard-btn'),
-            showResults: document.getElementById('results-btn'),
-            showSolutions: document.getElementById('solutions-btn'),
-            startGame: document.getElementById('start-game-btn'),
-            cancelName: document.getElementById('cancel-name-btn'),
-            playAgain: document.getElementById('play-again-btn'),
-            checkAnswer: document.getElementById('check-answer-btn'),
-            backToHomeFromResults: document.getElementById('back-to-home-from-results-btn'),
-            backToHomeFromSolutions: document.getElementById('back-to-home-from-solutions-btn'),
-        };
+
         const inputs = {
-            playerName: document.getElementById('player-name-input'),
-            pastSimple: document.getElementById('past-simple-input'),
-            pastParticiple: document.getElementById('past-participle-input'),
+            name: document.getElementById('player-name'),
+            i: document.getElementById('input-infinitive'),
+            p: document.getElementById('input-past'),
+            pp: document.getElementById('input-participle')
         };
-        const displays = {
-            timer: document.getElementById('timer'),
-            questionCounter: document.getElementById('question-counter'),
-            questionArea: document.getElementById('question-area'),
-            spanishHint: document.getElementById('spanish-hint'),
-            scoresList: document.getElementById('scores-list'),
-            solutionsTableBody: document.getElementById('solutions-table-body'),
-        };
-        const answerForm = document.getElementById('answer-form');
-        const pastParticipleWrapper = document.getElementById('past-participle-wrapper');
-
-        // --- Game State ---
-        let playerName = '';
-        let verbs = [];
-        let gameMode = 'hard'; // 'easy' or 'hard'
-        let currentQuestion = null;
-        let questionsAsked = 0;
-        let correctAnswersCount = 0;
-        const TOTAL_QUESTIONS = 10;
-        let usedVerbIndices = new Set();
-        let timerInterval = null;
-        let seconds = 0;
-
-        // --- Data Loading ---
-        async function loadVerbs() {
-            try {
-                const csvContent = `Infinitive,Past Simple,Past Participle,Spanish
-arise,arose,arisen,surgir
-awake,awoke,awoken,despertar
-be,was/were,been,ser/estar
-bear,bore,born(e),soportar/dar a luz
-beat,beat,beaten,golpear
-become,became,become,convertirse
-begin,began,begun,empezar
-bend,bent,bent,doblar
-bet,bet,bet,apostar
-bind,bound,bound,atar
-bite,bit,bitten,morder
-bleed,bled,bled,sangrar
-blow,blew,blown,soplar
-break,broke,broken,romper
-breed,bred,bred,criar
-bring,brought,brought,traer
-broadcast,broadcast,broadcast,transmitir
-build,built,built,construir
-burn,burnt/burned,burnt/burned,quemar
-burst,burst,burst,explotar
-buy,bought,bought,comprar
-can,could,been able,poder
-catch,caught,caught,atrapar
-choose,chose,chosen,elegir
-cling,clung,clung,aferrarse
-come,came,come,venir
-cost,cost,cost,costar
-creep,crept,crept,arrastrarse
-cut,cut,cut,cortar
-deal,dealt,dealt,tratar
-dig,dug,dug,cavar
-do,did,done,hacer
-draw,drew,drawn,dibujar
-dream,dreamt/dreamed,dreamt/dreamed,soñar
-drink,drank,drunk,beber
-drive,drove,driven,conducir
-eat,ate,eaten,comer
-fall,fell,fallen,caer
-feed,fed,fed,alimentar
-feel,felt,felt,sentir
-fight,fought,fought,luchar
-find,found,found,encontrar
-fly,flew,flown,volar
-forbid,forbade,forbidden,prohibir
-forget,forgot,forgotten,olvidar
-forgive,forgave,forgiven,perdonar
-freeze,froze,frozen,congelar
-get,got,got,conseguir
-give,gave,given,dar
-go,went,gone,ir
-grind,ground,ground,moler
-grow,grew,grown,crecer
-hang,hung,hung,colgar
-have,had,had,tener
-hear,heard,heard,oir
-hide,hid,hidden,esconder
-hit,hit,hit,golpear
-hold,held,held,sostener
-hurt,hurt,hurt,herir
-keep,kept,kept,mantener
-kneel,knelt,knelt,arrodillarse
-know,knew,known,saber
-lay,laid,laid,poner
-lead,led,led,liderar
-lean,leant/leaned,leant/leaned,apoyarse
-learn,learnt/learned,learnt/learned,aprender
-leave,left,left,dejar
-lend,lent,lent,prestar
-let,let,let,permitir
-lie,lay,lain,yacer
-light,lit/lighted,lit/lighted,encender
-lose,lost,lost,perder
-make,made,made,hacer
-mean,meant,meant,significar
-meet,met,met,conocer
-mow,mowed,mown/mowed,segar
-must,had to,had to,deber
-overcome,overcame,overcome,superar
-pay,paid,paid,pagar
-put,put,put,poner
-read,read,read,leer
-ride,rode,ridden,montar
-ring,rang,rung,sonar
-rise,rose,risen,elevarse
-run,ran,run,correr
-saw,sawed,sawn/sawed,serrar
-say,said,said,decir
-see,saw,seen,ver
-seek,sought,sought,buscar
-sell,sold,sold,vender
-send,sent,sent,enviar
-set,set,set,establecer
-sew,sewed,sewn/sewed,coser
-shake,shook,shaken,agitar
-shall,should,should,deber
-shed,shed,shed,derramar
-shine,shone,shone,brillar
-shoot,shot,shot,disparar
-show,showed,shown,mostrar
-shrink,shrank,shrunk,encoger
-shut,shut,shut,cerrar
-sing,sang,sung,cantar
-sink,sank,sunk,hundir
-sit,sat,sat,sentarse
-sleep,slept,slept,dormir
-slide,slid,slid,deslizar
-smell,smelt,smelt,oler
-sow,sowed,sown/sowed,sembrar
-speak,spoke,spoken,hablar
-speed,sped,sped,acelerar
-spell,spelt/spelled,spelt/spelled,deletrear
-spend,spent,spent,gastar
-spill,spilt/spilled,spilt/spilled,derramar
-spit,spat,spat,escupir
-spread,spread,spread,extender
-stand,stood,stood,estar de pie
-steal,stole,stolen,robar
-stick,stuck,stuck,pegar
-sting,stung,stung,picar
-stink,stank,stunk,apestar
-strike,struck,struck,golpear
-swear,swore,sworn,jurar
-sweep,swept,swept,barrer
-swell,swelled,swollen/swelled,hinchar
-swim,swam,swum,nadar
-swing,swung,swung,balancear
-take,took,taken,tomar
-teach,taught,taught,enseñar
-tear,tore,torn,rasgar
-tell,told,told,decir
-think,thought,thought,pensar
-throw,threw,thrown,lanzar
-tread,trod,trodden,pisar
-understand,understood,understood,entender
-wake,woke,woken,despertar
-wear,wore,worn,llevar puesto
-weep,wept,wept,llorar
-win,won,won,ganar
-wind,wound,wound,enrollar
-write,wrote,written,escribir`;
-                const lines = csvContent.trim().split('\n').slice(1);
-                verbs = lines.map(line => {
-                    const [infinitive, past, participle, spanish] = line.split(',').map(v => v.trim());
-                    return { infinitive, past, participle, spanish };
-                });
-            } catch (error) {
-                console.error("Failed to load verbs:", error);
-                displays.questionArea.textContent = "Error: Could not load game data.";
-            }
-        }
-
-        // --- Navigation & Content Display ---
-        function showScreen(screenName) {
-            Object.values(screens).forEach(s => s.classList.remove('active'));
-            screens[screenName].classList.add('active');
-        }
-
-        function showSolutions() {
-            displays.solutionsTableBody.innerHTML = ''; // Clear previous data
-            verbs.forEach((verb, index) => {
-                const row = document.createElement('tr');
-                row.className = index % 2 === 0 ? 'bg-white/60' : 'bg-slate-200/60';
-                row.innerHTML = `
-                    <td class="p-2 font-bold">${verb.infinitive}</td>
-                    <td class="p-2">${verb.past}</td>
-                    <td class="p-2">${verb.participle}</td>
-                    <td class="p-2">${verb.spanish}</td>
-                `;
-                displays.solutionsTableBody.appendChild(row);
-            });
-            showScreen('solutions');
-        }
-
-        // --- Timer ---
-        function startTimer() {
-            seconds = 0;
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                seconds++;
-                updateTimerDisplay();
-            }, 1000);
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-
-        function updateTimerDisplay() {
-            const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-            const secs = String(seconds % 60).padStart(2, '0');
-            displays.timer.textContent = `${mins}:${secs}`;
-        }
-
-        // --- Game Logic ---
-        function prepareNewGame(mode) {
-            gameMode = mode;
-            showScreen('nameModal');
-            inputs.playerName.focus();
-        }
         
-        function nextQuestionHandler() {
-             questionsAsked++;
-            if (questionsAsked >= TOTAL_QUESTIONS) {
+        const containers = {
+            i: document.getElementById('container-infinitive'),
+            p: document.getElementById('container-past'),
+            pp: document.getElementById('container-participle'),
+            grid: document.getElementById('inputs-container')
+        }
+
+        const btns = {
+            easy: document.getElementById('btn-easy'),
+            hard: document.getElementById('btn-hard'),
+            submit: document.getElementById('btn-submit'),
+            next: document.getElementById('btn-next'),
+            quit: document.getElementById('btn-quit'),
+            homeResults: document.getElementById('btn-home-results'),
+            replay: document.getElementById('btn-replay'),
+            viewList: document.getElementById('btn-view-list'),
+            closeList: document.getElementById('btn-close-list'),
+            viewResults: document.getElementById('btn-view-results')
+        };
+
+        const displays = {
+            qNumber: document.getElementById('q-number'),
+            score: document.getElementById('score-display'),
+            feedback: document.getElementById('feedback-area'),
+            finalName: document.getElementById('final-player-name'),
+            finalScore: document.getElementById('final-score'),
+            finalBar: document.getElementById('final-bar'),
+            finalTime: document.getElementById('final-time'),
+            miniScoreboard: document.getElementById('mini-scoreboard'),
+            tableBody: document.getElementById('verbs-table-body')
+        };
+
+        // --- NAVIGATION ---
+        function showScreen(screenId) {
+            Object.values(screens).forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('animate-pop');
+            });
+            const active = screens[screenId];
+            active.classList.remove('hidden');
+            if(screenId !== 'game') active.classList.add('animate-pop');
+        }
+
+        // --- GAME LOGIC ---
+
+        function startGame(mode) {
+            const name = inputs.name.value.trim() || 'Guest';
+            state.playerName = name;
+            state.mode = mode;
+            state.score = 0;
+            state.questionCount = 0;
+            state.startTime = new Date();
+            
+            showScreen('game');
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (state.questionCount >= state.totalQuestions) {
                 endGame();
+                return;
+            }
+
+            state.questionCount++;
+            displays.qNumber.textContent = state.questionCount;
+            displays.score.textContent = state.score;
+            
+            // Reset UI
+            resetInputs();
+            btns.submit.classList.remove('hidden');
+            btns.next.classList.add('hidden');
+            displays.feedback.style.opacity = '0';
+
+            // Select random verb
+            const randomIndex = Math.floor(Math.random() * verbsData.length);
+            state.currentVerb = verbsData[randomIndex];
+
+            // --- MODE LOGIC START ---
+            if (state.mode === 'easy') {
+                // EASY MODE: 
+                // 1. Infinitive is CLUE (always shown).
+                // 2. Past Simple is TARGET (always input).
+                // 3. Past Participle is REMOVED/HIDDEN.
+                
+                state.hiddenFields = ['p']; // Only 'p' needs to be guessed
+                
+                // Adjust visibility
+                containers.pp.classList.add('hidden'); // Hide 3rd column
+                containers.grid.classList.remove('md:grid-cols-3'); // Adjust grid
+                containers.grid.classList.add('md:grid-cols-2');
+
+                // Setup fields
+                setupField('i', inputs.i); // Clue
+                setupField('p', inputs.p); // Target
+                // 'pp' is hidden, no setup needed for value, but we clear it just in case
+                inputs.pp.value = '';
+
             } else {
-                displays.questionCounter.textContent = `${questionsAsked + 1} / ${TOTAL_QUESTIONS}`;
-                generateQuestion();
+                // HARD MODE (Standard):
+                // 1. Randomize 2 hidden fields.
+                // 2. All 3 columns visible.
+                
+                // Adjust visibility (Reset grid)
+                containers.pp.classList.remove('hidden');
+                containers.grid.classList.remove('md:grid-cols-2');
+                containers.grid.classList.add('md:grid-cols-3');
+
+                const fields = ['i', 'p', 'pp'];
+                const shuffled = [...fields].sort(() => 0.5 - Math.random());
+                state.hiddenFields = shuffled.slice(0, 2); // Hide 2 fields
+
+                setupField('i', inputs.i);
+                setupField('p', inputs.p);
+                setupField('pp', inputs.pp);
+            }
+            // --- MODE LOGIC END ---
+
+            // Focus first editable input
+            const firstEditable = [inputs.i, inputs.p, inputs.pp].find(el => !el.disabled && !el.parentElement.parentElement.classList.contains('hidden'));
+            if(firstEditable) firstEditable.focus();
+        }
+
+        function setupField(key, inputEl) {
+            if (state.hiddenFields.includes(key)) {
+                // This is a target field
+                inputEl.value = '';
+                inputEl.disabled = false;
+                inputEl.classList.remove('bg-gray-200', 'text-gray-500', 'bg-gray-50', 'text-gray-800');
+                inputEl.classList.add('bg-white', 'text-gray-900');
+                inputEl.placeholder = '?';
+            } else {
+                // This is a clue field
+                inputEl.value = state.currentVerb[key];
+                inputEl.disabled = true;
+                inputEl.classList.remove('bg-white', 'text-gray-900');
+                inputEl.classList.add('bg-indigo-100', 'text-indigo-800'); // distinct style for clues
+                inputEl.placeholder = '';
             }
         }
 
-        function generateQuestion() {
-            if (verbs.length === 0) return;
-            
-            if (usedVerbIndices.size >= verbs.length) {
-                usedVerbIndices.clear();
-            }
-            
-            let verbIndex;
-            do {
-                verbIndex = Math.floor(Math.random() * verbs.length);
-            } while (usedVerbIndices.has(verbIndex));
-            
-            usedVerbIndices.add(verbIndex);
-
-            currentQuestion = verbs[verbIndex];
-            displays.questionArea.innerHTML = `Verb: <span class="text-pink-600">${currentQuestion.infinitive}</span>`;
-            displays.spanishHint.innerHTML = `Spanish: <span class="text-sky-600">${currentQuestion.spanish}</span>`;
-
-            // Clear input fields and errors
+        function resetInputs() {
             Object.values(inputs).forEach(input => {
-                if(input.id !== 'player-name-input') input.value = '';
-                input.classList.remove('input-error', 'input-correct-solution');
-                input.disabled = false;
+                if (input === inputs.name) return;
+                input.className = "input-field w-full p-4 text-center font-bold text-xl rounded-xl bg-gray-50 text-gray-800 placeholder-gray-300 shadow-inner";
             });
-            buttons.checkAnswer.disabled = false;
-
-            inputs.pastSimple.focus();
         }
 
         function checkAnswer(e) {
             e.preventDefault();
             
-            const pastSimpleAnswer = inputs.pastSimple.value.trim().toLowerCase();
-            const isPastSimpleCorrect = currentQuestion.past.toLowerCase().split('/').includes(pastSimpleAnswer);
-            
             let allCorrect = true;
+            let feedbackMsg = "Correct!";
+            let feedbackColor = "text-green-600";
 
-            if (!isPastSimpleCorrect) {
-                inputs.pastSimple.classList.add('input-error');
-                allCorrect = false;
-            }
+            // Only check fields that are hidden AND part of the current mode
+            // In easy mode, hiddenFields only contains 'p', so 'pp' is ignored automatically
+            state.hiddenFields.forEach(key => {
+                let inputEl;
+                if (key === 'i') inputEl = inputs.i;
+                if (key === 'p') inputEl = inputs.p;
+                if (key === 'pp') inputEl = inputs.pp;
 
-            if (gameMode === 'hard') {
-                const pastParticipleAnswer = inputs.pastParticiple.value.trim().toLowerCase();
-                const isPastParticipleCorrect = currentQuestion.participle.toLowerCase().split('/').includes(pastParticipleAnswer);
-                if (!isPastParticipleCorrect) {
-                    inputs.pastParticiple.classList.add('input-error');
+                const userVal = inputEl.value.trim().toLowerCase();
+                const correctVal = state.currentVerb[key].toLowerCase();
+
+                if (userVal === correctVal) {
+                    inputEl.classList.add('input-correct');
+                } else {
+                    inputEl.classList.add('input-incorrect');
+                    inputEl.value = `${state.currentVerb[key]} (${inputEl.value})`; // Show correct answer
                     allCorrect = false;
                 }
-            }
+                inputEl.disabled = true; // Lock input
+            });
 
             if (allCorrect) {
-                correctAnswersCount++;
-                nextQuestionHandler();
+                state.score++;
+                displays.score.textContent = state.score;
+                displays.score.classList.add('animate-bounce');
+                setTimeout(() => displays.score.classList.remove('animate-bounce'), 1000);
             } else {
-                // Show correct answers for failed inputs
-                if (!isPastSimpleCorrect) {
-                    inputs.pastSimple.value = currentQuestion.past.split('/')[0];
-                    inputs.pastSimple.classList.add('input-correct-solution');
-                }
-                if (gameMode === 'hard' && !inputs.pastParticiple.classList.contains('input-error')) {
-                     const pastParticipleAnswer = inputs.pastParticiple.value.trim().toLowerCase();
-                     const isPastParticipleCorrect = currentQuestion.participle.toLowerCase().split('/').includes(pastParticipleAnswer);
-                     if(!isPastParticipleCorrect){
-                        inputs.pastParticiple.value = currentQuestion.participle.split('/')[0];
-                        inputs.pastParticiple.classList.add('input-correct-solution');
-                     }
-                }
-                
-                // Disable form and move to next question after a delay
-                buttons.checkAnswer.disabled = true;
-                inputs.pastSimple.disabled = true;
-                inputs.pastParticiple.disabled = true;
-                setTimeout(nextQuestionHandler, 2000);
-            }
-        }
-
-        function startGame() {
-            playerName = inputs.playerName.value.trim();
-            if (!playerName) {
-                inputs.playerName.classList.add('animate-shake');
-                setTimeout(() => inputs.playerName.classList.remove('animate-shake'), 820);
-                return;
-            }
-            
-            if (gameMode === 'easy') {
-                pastParticipleWrapper.style.display = 'none';
-            } else {
-                pastParticipleWrapper.style.display = 'flex';
+                feedbackMsg = "Keep trying!";
+                feedbackColor = "text-red-500";
             }
 
-            questionsAsked = 0;
-            correctAnswersCount = 0;
-            usedVerbIndices.clear();
-            displays.questionCounter.textContent = `1 / ${TOTAL_QUESTIONS}`;
-            showScreen('game');
-            startTimer();
-            generateQuestion();
+            displays.feedback.textContent = feedbackMsg;
+            displays.feedback.className = `h-8 text-center font-bold text-lg ${feedbackColor}`;
+            displays.feedback.style.opacity = '1';
+
+            btns.submit.classList.add('hidden');
+            btns.next.classList.remove('hidden');
+            btns.next.focus();
         }
 
         function endGame() {
-            stopTimer();
-            saveScore(playerName, correctAnswersCount, seconds);
-            showResults();
-        }
+            state.endTime = new Date();
+            const timeDiff = Math.floor((state.endTime - state.startTime) / 1000);
+            const minutes = Math.floor(timeDiff / 60);
+            const seconds = timeDiff % 60;
+            const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-        // --- Scoring ---
-        function getScores() {
-            return JSON.parse(localStorage.getItem('verbGameScores') || '[]');
-        }
-
-        function saveScore(name, score, time) {
-            const scores = getScores();
-            scores.push({ name, score, time, mode: gameMode });
+            displays.finalName.textContent = state.playerName;
+            displays.finalScore.textContent = `${state.score} / ${state.totalQuestions}`;
+            displays.finalTime.textContent = `Time: ${timeStr}`;
             
-            scores.sort((a, b) => {
-                if (b.score !== a.score) {
-                    return b.score - a.score; // Higher score first
-                }
-                return a.time - b.time; // Lower time first for ties
-            });
+            // Animate bar
+            const pct = (state.score / state.totalQuestions) * 100;
+            setTimeout(() => {
+                displays.finalBar.style.width = `${pct}%`;
+            }, 300);
 
-            const top10 = scores.slice(0, 10);
-            localStorage.setItem('verbGameScores', JSON.stringify(top10));
-        }
+            // Save score
+            const record = {
+                name: state.playerName,
+                score: state.score,
+                total: state.totalQuestions,
+                mode: state.mode,
+                date: new Date().toLocaleDateString()
+            };
+            scores.unshift(record);
+            if (scores.length > 20) scores.pop(); // keep last 20
+            localStorage.setItem('verbScores', JSON.stringify(scores));
 
-        function showResults() {
-            const scores = getScores();
-            displays.scoresList.innerHTML = ''; 
-
-            if (scores.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="4" class="text-center text-slate-500 font-bold p-4">No scores yet. Be the first!</td>`;
-                displays.scoresList.appendChild(row);
-            } else {
-                const medals = ['🥇', '🥈', '🥉'];
-                scores.forEach((score, index) => {
-                    const mins = String(Math.floor(score.time / 60)).padStart(2, '0');
-                    const secs = String(score.time % 60).padStart(2, '0');
-                    const timeFormatted = `${mins}:${secs}`;
-                    const modeLabel = score.mode === 'hard' ? '(H)' : '(E)';
-                    
-                    const row = document.createElement('tr');
-                    row.className = 'font-bold transition-all';
-                    row.classList.add(index % 2 === 0 ? 'bg-white/90' : 'bg-slate-200/90');
-                    row.innerHTML = `
-                        <td class="p-2 text-center text-2xl">${medals[index] || (index + 1)}</td>
-                        <td class="p-2 text-slate-700">${score.name} <span class="text-xs text-slate-400">${modeLabel}</span></td>
-                        <td class="p-2 text-center text-indigo-600">${score.score}/${TOTAL_QUESTIONS}</td>
-                        <td class="p-2 text-right text-slate-600 font-mono">${timeFormatted}</td>
-                    `;
-                    displays.scoresList.appendChild(row);
-                });
-            }
+            renderScoreboard();
             showScreen('results');
         }
 
-        // --- Event Listeners ---
-        buttons.newGameEasy.addEventListener('click', () => prepareNewGame('easy'));
-        buttons.newGameHard.addEventListener('click', () => prepareNewGame('hard'));
-        buttons.cancelName.addEventListener('click', () => showScreen('home'));
-        buttons.showResults.addEventListener('click', showResults);
-        buttons.showSolutions.addEventListener('click', showSolutions);
-        buttons.startGame.addEventListener('click', startGame);
-        inputs.playerName.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') startGame();
-        });
-        buttons.playAgain.addEventListener('click', () => {
-            prepareNewGame(gameMode);
-        });
-        buttons.backToHomeFromResults.addEventListener('click', () => showScreen('home'));
-        buttons.backToHomeFromSolutions.addEventListener('click', () => showScreen('home'));
-        answerForm.addEventListener('submit', checkAnswer);
+        function renderScoreboard() {
+            displays.miniScoreboard.innerHTML = scores.map(s => `
+                <div class="p-3 flex justify-between items-center hover:bg-gray-50">
+                    <div>
+                        <div class="font-bold text-gray-700">${s.name}</div>
+                        <div class="text-xs text-gray-400">${s.mode.toUpperCase()} • ${s.date}</div>
+                    </div>
+                    <div class="font-black text-indigo-600">${s.score}/${s.total}</div>
+                </div>
+            `).join('');
+        }
 
-        // --- Initialization ---
-        window.addEventListener('load', () => {
-            loadVerbs();
-            showScreen('home');
+        function populateList() {
+            displays.tableBody.innerHTML = verbsData.map(v => `
+                <tr class="hover:bg-indigo-50 transition-colors">
+                    <td class="p-2 border-b border-gray-100 font-bold">${v.i}</td>
+                    <td class="p-2 border-b border-gray-100">${v.p}</td>
+                    <td class="p-2 border-b border-gray-100">${v.pp}</td>
+                </tr>
+            `).join('');
+        }
+
+        // --- EVENT LISTENERS ---
+        btns.easy.addEventListener('click', () => startGame('easy'));
+        btns.hard.addEventListener('click', () => startGame('hard'));
+        document.getElementById('game-form').addEventListener('submit', checkAnswer);
+        btns.next.addEventListener('click', nextQuestion);
+        btns.quit.addEventListener('click', () => showScreen('home'));
+        btns.homeResults.addEventListener('click', () => showScreen('home'));
+        btns.replay.addEventListener('click', () => startGame(state.mode));
+        
+        btns.viewList.addEventListener('click', () => {
+            populateList();
+            screens.list.classList.remove('hidden');
         });
+        btns.closeList.addEventListener('click', () => {
+            screens.list.classList.add('hidden');
+        });
+        btns.viewResults.addEventListener('click', () => {
+            renderScoreboard();
+            showScreen('results');
+        });
+
+        // Initialize
+        showScreen('home');
+
     </script>
 </body>
 </html>
