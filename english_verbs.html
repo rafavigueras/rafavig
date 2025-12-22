@@ -16,7 +16,6 @@
             min-height: 100vh;
         }
         
-        /* Custom Animations */
         @keyframes popIn {
             0% { opacity: 0; transform: scale(0.9); }
             100% { opacity: 1; transform: scale(1); }
@@ -45,7 +44,6 @@
             color: #b91c1c !important;
         }
         
-        /* Utility */
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -98,7 +96,6 @@
 
             <!-- SCREEN: GAME -->
             <div id="screen-game" class="hidden p-6 md:p-8 h-full flex flex-col">
-                <!-- Game Header -->
                 <div class="flex justify-between items-center mb-6 bg-indigo-50 rounded-xl p-3">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg" id="q-number">1</div>
@@ -110,7 +107,6 @@
                     </div>
                 </div>
 
-                <!-- Verb Forms Grid -->
                 <form id="game-form" class="flex-1 flex flex-col justify-center gap-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="inputs-container">
                         
@@ -139,12 +135,8 @@
                         </div>
                     </div>
 
-                    <!-- Feedback Area -->
-                    <div id="feedback-area" class="h-8 text-center font-bold text-lg opacity-0 transition-opacity">
-                        <!-- JS injects feedback here -->
-                    </div>
+                    <div id="feedback-area" class="h-8 text-center font-bold text-lg opacity-0 transition-opacity"></div>
 
-                    <!-- Action Button -->
                     <button type="submit" id="btn-submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xl shadow-lg transition-transform active:scale-95">
                         Check Answer
                     </button>
@@ -160,15 +152,13 @@
 
             <!-- SCREEN: RESULTS -->
             <div id="screen-results" class="hidden p-8 flex flex-col items-center justify-center text-center h-full space-y-6 animate-pop">
-                <div class="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl shadow-lg mb-2">
-                    🏆
-                </div>
+                <div class="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl shadow-lg mb-2">🏆</div>
                 <div>
                     <h2 class="text-3xl font-black text-gray-800 mb-1">Game Over!</h2>
                     <p class="text-gray-500 font-bold" id="final-player-name">Player</p>
                 </div>
                 
-                <div class="bg-indigo-50 rounded-2xl p-6 w-full max-w-sm">
+                <div class="bg-indigo-50 rounded-2xl p-6 w-full max-sm">
                     <div class="flex justify-between items-end mb-2">
                         <span class="text-gray-500 font-bold text-sm uppercase">Final Score</span>
                         <span class="text-4xl font-black text-indigo-600" id="final-score">0/10</span>
@@ -180,20 +170,13 @@
                 </div>
 
                 <div class="flex gap-4 w-full pt-4">
-                    <button id="btn-home-results" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors">
-                        Home
-                    </button>
-                    <button id="btn-replay" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-colors">
-                        Play Again
-                    </button>
+                    <button id="btn-home-results" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors">Home</button>
+                    <button id="btn-replay" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-colors">Play Again</button>
                 </div>
                 
-                <!-- Scoreboard preview -->
                 <div class="w-full mt-4">
                     <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-2">Recent Scores</h3>
-                    <div id="mini-scoreboard" class="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100 max-h-32 overflow-y-auto text-sm">
-                        <!-- Injected via JS -->
-                    </div>
+                    <div id="mini-scoreboard" class="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100 max-h-32 overflow-y-auto text-sm"></div>
                 </div>
             </div>
 
@@ -207,14 +190,13 @@
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-gray-100 text-gray-500 text-xs uppercase sticky top-0">
                             <tr>
-                                <th class="p-2 rounded-tl-lg">Infinitive</th>
+                                <th class="p-2">Infinitive</th>
                                 <th class="p-2">Past Simple</th>
-                                <th class="p-2 rounded-tr-lg">Participle</th>
+                                <th class="p-2">Participle</th>
+                                <th class="p-2">Spanish</th>
                             </tr>
                         </thead>
-                        <tbody id="verbs-table-body" class="text-gray-700 text-sm font-medium divide-y divide-gray-100">
-                            <!-- JS Injected -->
-                        </tbody>
+                        <tbody id="verbs-table-body" class="text-gray-700 text-sm font-medium divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
@@ -222,81 +204,79 @@
         </main>
         
         <footer class="text-center mt-6 text-white/60 text-sm font-bold">
-            English Verbs Trainer v2.0
+            English Verbs Trainer v2.1
         </footer>
     </div>
 
-    <!-- LOGIC -->
     <script>
         // --- DATA ---
-        // Based on the provided CSV file content
         const verbsData = [
-            { i: "be", p: "was / were", pp: "been" },
-            { i: "become", p: "became", pp: "become" },
-            { i: "begin", p: "began", pp: "begun" },
-            { i: "break", p: "broke", pp: "broken" },
-            { i: "bring", p: "brought", pp: "brought" },
-            { i: "build", p: "built", pp: "built" },
-            { i: "buy", p: "bought", pp: "bought" },
-            { i: "catch", p: "caught", pp: "caught" },
-            { i: "choose", p: "chose", pp: "chosen" },
-            { i: "cut", p: "cut", pp: "cut" },
-            { i: "come", p: "came", pp: "come" },
-            { i: "do", p: "did", pp: "done" },
-            { i: "draw", p: "drew", pp: "drawn" },
-            { i: "drink", p: "drank", pp: "drunk" },
-            { i: "drive", p: "drove", pp: "driven" },
-            { i: "eat", p: "ate", pp: "eaten" },
-            { i: "fall", p: "fell", pp: "fallen" },
-            { i: "feel", p: "felt", pp: "felt" },
-            { i: "fight", p: "fought", pp: "fought" },
-            { i: "find", p: "found", pp: "found" },
-            { i: "fly", p: "flew", pp: "flown" },
-            { i: "forget", p: "forgot", pp: "forgotten" },
-            { i: "get", p: "got", pp: "got" },
-            { i: "give", p: "gave", pp: "given" },
-            { i: "go", p: "went", pp: "gone" },
-            { i: "grow", p: "grew", pp: "grown" },
-            { i: "have", p: "had", pp: "had" },
-            { i: "hear", p: "heard", pp: "heard" },
-            { i: "hide", p: "hid", pp: "hidden" },
-            { i: "hold", p: "held", pp: "held" },
-            { i: "keep", p: "kept", pp: "kept" },
-            { i: "know", p: "knew", pp: "known" },
-            { i: "learn", p: "learned", pp: "learned" },
-            { i: "leave", p: "left", pp: "left" },
-            { i: "lend", p: "lent", pp: "lent" },
-            { i: "light", p: "lit", pp: "lit" },
-            { i: "lose", p: "lost", pp: "lost" },
-            { i: "make", p: "made", pp: "made" },
-            { i: "meet", p: "met", pp: "met" },
-            { i: "pay", p: "paid", pp: "paid" },
-            { i: "put", p: "put", pp: "put" },
-            { i: "read", p: "read", pp: "read" },
-            { i: "ride", p: "rode", pp: "ridden" },
-            { i: "run", p: "ran", pp: "run" },
-            { i: "say", p: "said", pp: "said" },
-            { i: "see", p: "saw", pp: "seen" },
-            { i: "sell", p: "sold", pp: "sold" },
-            { i: "send", p: "sent", pp: "sent" },
-            { i: "sew", p: "sewed", pp: "sewn" },
-            { i: "sing", p: "sang", pp: "sung" },
-            { i: "show", p: "showed", pp: "shown" },
-            { i: "sit", p: "sat", pp: "sat" },
-            { i: "speak", p: "spoke", pp: "spoken" },
-            { i: "spend", p: "spent", pp: "spent" },
-            { i: "stand", p: "stood", pp: "stood" },
-            { i: "swim", p: "swam", pp: "swum" },
-            { i: "take", p: "took", pp: "taken" },
-            { i: "teach", p: "taught", pp: "taught" },
-            { i: "tell", p: "told", pp: "told" },
-            { i: "think", p: "thought", pp: "thought" },
-            { i: "throw", p: "threw", pp: "thrown" },
-            { i: "understand", p: "understood", pp: "understood" },
-            { i: "wake", p: "woke", pp: "woken" },
-            { i: "wear", p: "wore", pp: "worn" },
-            { i: "win", p: "won", pp: "won" },
-            { i: "write", p: "wrote", pp: "written" }
+            { i: "be", p: "was / were", pp: "been", s: "ser / estar" },
+            { i: "become", p: "became", pp: "become", s: "llegar a ser" },
+            { i: "begin", p: "began", pp: "begun", s: "empezar" },
+            { i: "break", p: "broke", pp: "broken", s: "romper" },
+            { i: "bring", p: "brought", pp: "brought", s: "traer" },
+            { i: "build", p: "built", pp: "built", s: "construir" },
+            { i: "buy", p: "bought", pp: "bought", s: "comprar" },
+            { i: "catch", p: "caught", pp: "caught", s: "atrapar" },
+            { i: "choose", p: "chose", pp: "chosen", s: "elegir" },
+            { i: "cut", p: "cut", pp: "cut", s: "cortar" },
+            { i: "come", p: "came", pp: "come", s: "venir" },
+            { i: "do", p: "did", pp: "done", s: "hacer" },
+            { i: "draw", p: "drew", pp: "drawn", s: "dibujar" },
+            { i: "drink", p: "drank", pp: "drunk", s: "beber" },
+            { i: "drive", p: "drove", pp: "driven", s: "conducir" },
+            { i: "eat", p: "ate", pp: "eaten", s: "comer" },
+            { i: "fall", p: "fell", pp: "fallen", s: "caer" },
+            { i: "feel", p: "felt", pp: "felt", s: "sentir" },
+            { i: "fight", p: "fought", pp: "fought", s: "pelear" },
+            { i: "find", p: "found", pp: "found", s: "encontrar" },
+            { i: "fly", p: "flew", pp: "flown", s: "volar" },
+            { i: "forget", p: "forgot", pp: "forgotten", s: "olvidar" },
+            { i: "get", p: "got", pp: "got", s: "obtener / llegar" },
+            { i: "give", p: "gave", pp: "given", s: "dar" },
+            { i: "go", p: "went", pp: "gone", s: "ir" },
+            { i: "grow", p: "grew", pp: "grown", s: "crecer" },
+            { i: "have", p: "had", pp: "had", s: "tener / haber" },
+            { i: "hear", p: "heard", pp: "heard", s: "oír" },
+            { i: "hide", p: "hid", pp: "hidden", s: "esconder" },
+            { i: "hold", p: "held", pp: "held", s: "sujetar" },
+            { i: "keep", p: "kept", pp: "kept", s: "mantener" },
+            { i: "know", p: "knew", pp: "known", s: "saber / conocer" },
+            { i: "learn", p: "learned", pp: "learned", s: "aprender" },
+            { i: "leave", p: "left", pp: "left", s: "dejar / salir" },
+            { i: "lend", p: "lent", pp: "lent", s: "prestar" },
+            { i: "light", p: "lit", pp: "lit", s: "encender" },
+            { i: "lose", p: "lost", pp: "lost", s: "perder" },
+            { i: "make", p: "made", pp: "made", s: "hacer / fabricar" },
+            { i: "meet", p: "met", pp: "met", s: "conocer / encontrarse" },
+            { i: "pay", p: "paid", pp: "paid", s: "pagar" },
+            { i: "put", p: "put", pp: "put", s: "poner" },
+            { i: "read", p: "read", pp: "read", s: "leer" },
+            { i: "ride", p: "rode", pp: "ridden", s: "montar" },
+            { i: "run", p: "ran", pp: "run", s: "correr" },
+            { i: "say", p: "said", pp: "said", s: "decir" },
+            { i: "see", p: "saw", pp: "seen", s: "ver" },
+            { i: "sell", p: "sold", pp: "sold", s: "vender" },
+            { i: "send", p: "sent", pp: "sent", s: "enviar" },
+            { i: "sew", p: "sewed", pp: "sewn", s: "coser" },
+            { i: "sing", p: "sang", pp: "sung", s: "cantar" },
+            { i: "show", p: "showed", pp: "shown", s: "mostrar" },
+            { i: "sit", p: "sat", pp: "sat", s: "sentarse" },
+            { i: "speak", p: "spoke", pp: "spoken", s: "hablar" },
+            { i: "spend", p: "spent", pp: "spent", s: "gastar / pasar tiempo" },
+            { i: "stand", p: "stood", pp: "stood", s: "estar de pie" },
+            { i: "swim", p: "swam", pp: "swum", s: "nadar" },
+            { i: "take", p: "took", pp: "taken", s: "tomar / llevar" },
+            { i: "teach", p: "taught", pp: "taught", s: "enseñar" },
+            { i: "tell", p: "told", pp: "told", s: "contar / decir" },
+            { i: "think", p: "thought", pp: "thought", s: "pensar" },
+            { i: "throw", p: "threw", pp: "thrown", s: "lanzar" },
+            { i: "understand", p: "understood", pp: "understood", s: "entender" },
+            { i: "wake", p: "woke", pp: "woken", s: "despertar" },
+            { i: "wear", p: "wore", pp: "worn", s: "llevar puesto" },
+            { i: "win", p: "won", pp: "won", s: "ganar" },
+            { i: "write", p: "wrote", pp: "written", s: "escribir" }
         ];
 
         // --- STATE ---
@@ -305,11 +285,11 @@
             score: 0,
             questionCount: 0,
             totalQuestions: 10,
-            mode: 'easy', // 'easy' or 'hard'
+            mode: 'easy',
             currentVerb: null,
             startTime: null,
             endTime: null,
-            hiddenFields: [] // ['i', 'p', 'pp'] keys that are hidden
+            hiddenFields: []
         };
 
         const scores = JSON.parse(localStorage.getItem('verbScores')) || [];
@@ -373,7 +353,6 @@
         }
 
         // --- GAME LOGIC ---
-
         function startGame(mode) {
             const name = inputs.name.value.trim() || 'Guest';
             state.playerName = name;
@@ -396,75 +375,55 @@
             displays.qNumber.textContent = state.questionCount;
             displays.score.textContent = state.score;
             
-            // Reset UI
             resetInputs();
             btns.submit.classList.remove('hidden');
             btns.next.classList.add('hidden');
             displays.feedback.style.opacity = '0';
 
-            // Select random verb
             const randomIndex = Math.floor(Math.random() * verbsData.length);
             state.currentVerb = verbsData[randomIndex];
 
-            // --- MODE LOGIC START ---
             if (state.mode === 'easy') {
-                // EASY MODE: 
-                // 1. Infinitive is CLUE (always shown).
-                // 2. Past Simple is TARGET (always input).
-                // 3. Past Participle is REMOVED/HIDDEN.
-                
-                state.hiddenFields = ['p']; // Only 'p' needs to be guessed
-                
-                // Adjust visibility
-                containers.pp.classList.add('hidden'); // Hide 3rd column
-                containers.grid.classList.remove('md:grid-cols-3'); // Adjust grid
+                state.hiddenFields = ['p'];
+                containers.pp.classList.add('hidden');
+                containers.grid.classList.remove('md:grid-cols-3');
                 containers.grid.classList.add('md:grid-cols-2');
 
-                // Setup fields
-                setupField('i', inputs.i); // Clue
-                setupField('p', inputs.p); // Target
-                // 'pp' is hidden, no setup needed for value, but we clear it just in case
+                setupField('i', inputs.i); 
+                setupField('p', inputs.p); 
                 inputs.pp.value = '';
-
             } else {
-                // HARD MODE (Standard):
-                // 1. Randomize 2 hidden fields.
-                // 2. All 3 columns visible.
-                
-                // Adjust visibility (Reset grid)
                 containers.pp.classList.remove('hidden');
                 containers.grid.classList.remove('md:grid-cols-2');
                 containers.grid.classList.add('md:grid-cols-3');
 
                 const fields = ['i', 'p', 'pp'];
                 const shuffled = [...fields].sort(() => 0.5 - Math.random());
-                state.hiddenFields = shuffled.slice(0, 2); // Hide 2 fields
+                state.hiddenFields = shuffled.slice(0, 2); 
 
                 setupField('i', inputs.i);
                 setupField('p', inputs.p);
                 setupField('pp', inputs.pp);
             }
-            // --- MODE LOGIC END ---
 
-            // Focus first editable input
             const firstEditable = [inputs.i, inputs.p, inputs.pp].find(el => !el.disabled && !el.parentElement.parentElement.classList.contains('hidden'));
             if(firstEditable) firstEditable.focus();
         }
 
         function setupField(key, inputEl) {
             if (state.hiddenFields.includes(key)) {
-                // This is a target field
                 inputEl.value = '';
                 inputEl.disabled = false;
                 inputEl.classList.remove('bg-gray-200', 'text-gray-500', 'bg-gray-50', 'text-gray-800');
                 inputEl.classList.add('bg-white', 'text-gray-900');
                 inputEl.placeholder = '?';
             } else {
-                // This is a clue field
-                inputEl.value = state.currentVerb[key];
+                // MODIFIED: Show translation in parentheses when showing the clue
+                const valueWithTranslation = `${state.currentVerb[key]} (${state.currentVerb.s})`;
+                inputEl.value = valueWithTranslation;
                 inputEl.disabled = true;
                 inputEl.classList.remove('bg-white', 'text-gray-900');
-                inputEl.classList.add('bg-indigo-100', 'text-indigo-800'); // distinct style for clues
+                inputEl.classList.add('bg-indigo-100', 'text-indigo-800', 'text-base'); // Smaller text for long strings
                 inputEl.placeholder = '';
             }
         }
@@ -483,8 +442,6 @@
             let feedbackMsg = "Correct!";
             let feedbackColor = "text-green-600";
 
-            // Only check fields that are hidden AND part of the current mode
-            // In easy mode, hiddenFields only contains 'p', so 'pp' is ignored automatically
             state.hiddenFields.forEach(key => {
                 let inputEl;
                 if (key === 'i') inputEl = inputs.i;
@@ -498,10 +455,11 @@
                     inputEl.classList.add('input-correct');
                 } else {
                     inputEl.classList.add('input-incorrect');
-                    inputEl.value = `${state.currentVerb[key]} (${inputEl.value})`; // Show correct answer
+                    // MODIFIED: Correct answer also shows translation
+                    inputEl.value = `${state.currentVerb[key]} (${state.currentVerb.s})`;
                     allCorrect = false;
                 }
-                inputEl.disabled = true; // Lock input
+                inputEl.disabled = true;
             });
 
             if (allCorrect) {
@@ -534,13 +492,11 @@
             displays.finalScore.textContent = `${state.score} / ${state.totalQuestions}`;
             displays.finalTime.textContent = `Time: ${timeStr}`;
             
-            // Animate bar
             const pct = (state.score / state.totalQuestions) * 100;
             setTimeout(() => {
                 displays.finalBar.style.width = `${pct}%`;
             }, 300);
 
-            // Save score
             const record = {
                 name: state.playerName,
                 score: state.score,
@@ -549,7 +505,7 @@
                 date: new Date().toLocaleDateString()
             };
             scores.unshift(record);
-            if (scores.length > 20) scores.pop(); // keep last 20
+            if (scores.length > 20) scores.pop();
             localStorage.setItem('verbScores', JSON.stringify(scores));
 
             renderScoreboard();
@@ -574,6 +530,7 @@
                     <td class="p-2 border-b border-gray-100 font-bold">${v.i}</td>
                     <td class="p-2 border-b border-gray-100">${v.p}</td>
                     <td class="p-2 border-b border-gray-100">${v.pp}</td>
+                    <td class="p-2 border-b border-gray-100 italic text-indigo-600">${v.s}</td>
                 </tr>
             `).join('');
         }
@@ -599,10 +556,7 @@
             showScreen('results');
         });
 
-        // Initialize
         showScreen('home');
-
     </script>
 </body>
 </html>
-
